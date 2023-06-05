@@ -1,6 +1,12 @@
 const { EventEmitter } = require('events');
 const fontManager = require('./build/Release/font_manager.node');
 
+function filterFonts(fonts) {
+  return process.platform == 'win32' 
+    ? fonts.filter((f, i, l) => !f.startsWith('@') || f != `@${l[i - 1]}`)
+    : fonts
+}
+
 function getAvailableFonts(params = {}) {
   const options = [
     'bold',
@@ -35,7 +41,7 @@ function getAvailableMembersOfFontFamily(fontFamily) {
     throw new TypeError('fontFamily must be a string')
   }
 
-  return fontManager.getAvailableMembersOfFontFamily.call(this, fontFamily)
+  return filterFonts(fontManager.getAvailableMembersOfFontFamily.call(this, fontFamily))
 }
 
 class FontPanel extends EventEmitter {
@@ -56,9 +62,13 @@ class FontPanel extends EventEmitter {
   }
 }
 
+function getAvailableFontFamilies() {
+  return filterFonts(fontManager.getAvailableFontFamilies())
+}
+
 module.exports = {
   getAvailableFonts,
   getAvailableMembersOfFontFamily,
-  getAvailableFontFamilies: fontManager.getAvailableFontFamilies,
+  getAvailableFontFamilies,
   FontPanel,
 }
