@@ -1,5 +1,10 @@
 const { EventEmitter } = require('events');
-const fontManager = require('./build/Release/font_manager.node');
+
+let fontManager
+const getFontManager = () => {
+  if (!fontManager) fontManager = require('./build/Release/font_manager.node')
+  return fontManager
+}
 
 function filterFonts(fonts) {
   return process.platform == 'win32' 
@@ -33,7 +38,7 @@ function getAvailableFonts(params = {}) {
     }
   }
 
-  return fontManager.getAvailableFonts.call(this, params)
+  return getFontManager().getAvailableFonts.call(this, params)
 }
 
 function getAvailableMembersOfFontFamily(fontFamily) {
@@ -41,7 +46,7 @@ function getAvailableMembersOfFontFamily(fontFamily) {
     throw new TypeError('fontFamily must be a string')
   }
 
-  return filterFonts(fontManager.getAvailableMembersOfFontFamily.call(this, fontFamily))
+  return filterFonts(getFontManager().getAvailableMembersOfFontFamily.call(this, fontFamily))
 }
 
 class FontPanel extends EventEmitter {
@@ -58,12 +63,12 @@ class FontPanel extends EventEmitter {
         delete o.parent;
       }
     }
-    return fontManager.showFontPanel.call(this, this.emit.bind(this), o);
+    return getFontManager().showFontPanel.call(this, this.emit.bind(this), o);
   }
 }
 
 function getAvailableFontFamilies() {
-  return filterFonts(fontManager.getAvailableFontFamilies())
+  return filterFonts(getFontManager().getAvailableFontFamilies())
 }
 
 module.exports = {
